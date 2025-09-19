@@ -7,13 +7,13 @@ import { AuthService } from '../../../features/auth/services/auth.service';
   standalone: true,
   imports: [RouterLink],
   template: `
-    <header class="bg-blue-600 text-white p-4">
+    <header class="bg-purple-600 text-white p-4">
       <div class="container mx-auto flex justify-between items-center">
-        <h1 class="text-2xl font-bold">TodoList App</h1>
+        <h1 class="text-2xl font-bold">Jewels Shop</h1>
         <nav>
           <ul class="flex space-x-4">
             @if (currentUser()) {
-              <li><a routerLink="/todos" class="hover:text-blue-200">Todos</a></li>
+              <li><a routerLink="/jewels" class="hover:text-blue-200">Jewels</a></li>
               @if (currentUser()?.role === 'admin') {
                 <li><a routerLink="/admin" class="hover:text-blue-200">Admin</a></li>
               }

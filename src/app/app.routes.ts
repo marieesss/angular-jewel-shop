@@ -11,6 +11,6 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadChildren: () => import('./features/products/product.routes').then(m => m.PRODUCT_ROUTE),
   },
-  { path: '', redirectTo: 'todos', pathMatch: 'full' },
-  { path: '**', redirectTo: 'todos' },
+  { path: '', redirectTo: 'products', pathMatch: 'full' },
+  { path: '**', redirectTo: 'products' },
 ];
