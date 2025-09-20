@@ -2,10 +2,11 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [ButtonComponent],
+  imports: [ButtonComponent, RouterModule],
   template: `
     <div class="p-6">
       <div class="text-center py-8">
@@ -38,7 +39,9 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
 
               <!-- Actions -->
               <div class="flex gap-2 mt-4">
-                <app-button variant="primary" size="sm">Voir</app-button>
+                <a [routerLink]="[product.id]">
+                  <app-button variant="primary" size="sm">Voir</app-button>
+                </a>
               </div>
             </div>
           }
@@ -69,8 +72,4 @@ export class ProductListComponent implements OnInit {
       this.loading.set(false);
     }
   }
-
-  // viewProduct(id: number) {
-  //   // After
-  // }
 }

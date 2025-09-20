@@ -1,5 +1,4 @@
 import { Injectable, signal } from '@angular/core';
-import { Observable, of, throwError, delay } from 'rxjs';
 import { Product } from '../models/product.model';
 
 @Injectable({
@@ -59,10 +58,9 @@ export class ProductService {
     return this.products;
   }
 
-  getProductById(id: number): Observable<Product> {
+  async getProductById(id: number): Promise<Product | null> {
+    await this.delay(300);
     const product = this.products.find(p => p.id === id);
-    return product
-      ? of(product).pipe(delay(300))
-      : throwError(() => new Error('Produit non trouvé'));
+    return product || null;
   }
 }
