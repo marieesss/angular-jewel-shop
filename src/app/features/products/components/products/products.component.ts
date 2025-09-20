@@ -1,16 +1,26 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ProductService } from '../../services/product.service';
-import { Product } from '../../models/product.model';
+import { Product, ProductType } from '../../models/product.model';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { RouterModule } from '@angular/router';
+import { FilterByTypePipe } from '../../../../shared/pipes/jewel-filter.pipe';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [ButtonComponent, RouterModule],
+  imports: [ButtonComponent, RouterModule, FilterByTypePipe, FormsModule],
   template: `
     <div class="p-6">
       <div class="text-center py-8">
         <h2 class="text-2xl font-bold mb-6 text-gray-800">Jewels</h2>
+
+        <select class="border border-gray-300 rounded px-3 py-2" [(ngModel)]="selectedType">
+          <option value="all">Tous</option>
+          <option value="ring">Bagues</option>
+          <option value="necklace">Colliers</option>
+          <option value="bracelet">Bracelets</option>
+          <option value="earring">Boucles d'oreilles</option>
+        </select>
       </div>
 
       @if (loading()) {
@@ -22,7 +32,10 @@ import { RouterModule } from '@angular/router';
         </div>
       } @else {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          @for (product of productService.productsSignal(); track product.id) {
+          @for (
+            product of productService.productsSignal() | filterByType: selectedType;
+            track product.id
+          ) {
             <div
               class="bg-white shadow rounded-lg p-4 flex flex-col items-center text-center outline outline-purple-300 "
             >
@@ -58,6 +71,7 @@ export class ProductListComponent implements OnInit {
   productService = inject(ProductService);
   loading = signal(true);
   products = signal<Product[]>([]);
+  selectedType: ProductType | 'all' = 'all';
 
   ngOnInit() {
     this.loadProducts();

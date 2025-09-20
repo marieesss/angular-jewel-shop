@@ -1,3 +1,5 @@
+export type ProductType = 'ring' | 'necklace' | 'bracelet' | 'earring';
+
 export interface Product {
   id: number;
   name: string;
@@ -6,5 +8,5 @@ export interface Product {
   quantity: number;
   imageUrl: string;
   createdAt: Date;
-  type: 'ring' | 'necklace' | 'bracelet' | 'earring';
+  type: ProductType;
 }
