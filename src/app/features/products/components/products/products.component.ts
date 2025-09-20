@@ -1,10 +1,11 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [],
+  imports: [ButtonComponent],
   template: `
     <div class="p-6">
       <div class="text-center py-8">
@@ -22,7 +23,7 @@ import { Product } from '../../models/product.model';
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           @for (product of productService.productsSignal(); track product.id) {
             <div
-              class="bg-white shadow rounded-lg p-4 flex flex-col items-center text-center outline outline-purple-300 hover:outline-purple-200"
+              class="bg-white shadow rounded-lg p-4 flex flex-col items-center text-center outline outline-purple-300 "
             >
               <img
                 [src]="product.imageUrl"
@@ -37,12 +38,7 @@ import { Product } from '../../models/product.model';
 
               <!-- Actions -->
               <div class="flex gap-2 mt-4">
-                <button
-                  class="px-3 py-1 bg-pink-500 text-white text-sm rounded hover:bg-purple-600"
-                  (click)="viewProduct(product.id)"
-                >
-                  Voir
-                </button>
+                <app-button variant="primary" size="sm">Voir</app-button>
               </div>
             </div>
           }
@@ -69,14 +65,12 @@ export class ProductListComponent implements OnInit {
       this.loading.set(true);
       const productsListe = await this.productService.getAllProducts();
       this.products.set(productsListe);
-    } catch (error) {
-      console.error('Erreur lors du chargement des produits:', error);
     } finally {
       this.loading.set(false);
     }
   }
 
-  viewProduct(id: number) {
-    console.log('produit', id);
-  }
+  // viewProduct(id: number) {
+  //   // After
+  // }
 }
