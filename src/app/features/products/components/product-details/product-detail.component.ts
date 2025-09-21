@@ -6,6 +6,7 @@ import { Product } from '../../models/product.model';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { RouterLink } from '@angular/router';
 import { TotalPricePipe } from '../../../../shared/pipes/price.pipe';
+import { OrderService } from '../../../orders/services/order.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -55,7 +56,9 @@ import { TotalPricePipe } from '../../../../shared/pipes/price.pipe';
             </div>
 
             <div class="flex gap-4">
-              <app-button variant="primary" size="lg">Ajouter au panier</app-button>
+              <app-button variant="primary" size="lg" (clicked)="addToCart()"
+                >Ajouter au panier</app-button
+              >
             </div>
           </div>
         } @else {
@@ -69,6 +72,7 @@ export class ProductDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private productService = inject(ProductService);
+  private orderService = inject(OrderService);
 
   product = signal<Product | null>(null);
   loading = signal(true);
@@ -104,6 +108,14 @@ export class ProductDetailComponent implements OnInit {
     const stock = this.product()?.quantity ?? 1;
     if (this.quantity() < stock) {
       this.quantity.update(q => q + 1);
+    }
+  }
+
+  addToCart() {
+    const product = this.product();
+    const quantity = this.quantity();
+    if (product && quantity) {
+      this.orderService.addProduct(product, quantity);
     }
   }
 }
