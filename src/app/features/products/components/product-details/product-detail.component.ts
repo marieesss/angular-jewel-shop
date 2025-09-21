@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
@@ -57,8 +57,8 @@ import { OrderService } from '../../../orders/services/order.service';
 
             <div class="flex gap-4">
               <app-button variant="primary" size="lg" (clicked)="addToCart()"
-                >Ajouter au panier</app-button
-              >
+                >Ajouter au panier
+              </app-button>
             </div>
           </div>
         } @else {
@@ -68,7 +68,7 @@ import { OrderService } from '../../../orders/services/order.service';
     </div>
   `,
 })
-export class ProductDetailComponent implements OnInit {
+export class ProductDetailComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private productService = inject(ProductService);
@@ -76,9 +76,9 @@ export class ProductDetailComponent implements OnInit {
 
   product = signal<Product | null>(null);
   loading = signal(true);
-  quantity = signal(1);
+  quantity = signal(0);
 
-  ngOnInit() {
+  constructor() {
     this.loadProduct();
   }
 
@@ -105,7 +105,7 @@ export class ProductDetailComponent implements OnInit {
   }
 
   increaseQuantity() {
-    const stock = this.product()?.quantity ?? 1;
+    const stock = this.product()?.quantity ?? 0;
     if (this.quantity() < stock) {
       this.quantity.update(q => q + 1);
     }
@@ -117,5 +117,6 @@ export class ProductDetailComponent implements OnInit {
     if (product && quantity) {
       this.orderService.addProduct(product, quantity);
     }
+    this.router.navigate(['/products']);
   }
 }

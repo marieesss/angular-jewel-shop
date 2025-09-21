@@ -63,4 +63,12 @@ export class ProductService {
     const product = this.products.find(p => p.id === id);
     return product || null;
   }
+  async updateProduct(product: Product): Promise<void> {
+    await this.delay(300);
+    const index = this.products.findIndex(p => p.id === product.id);
+    if (index !== -1) {
+      this.products[index] = product;
+      this.saveProducts();
+    }
+  }
 }
