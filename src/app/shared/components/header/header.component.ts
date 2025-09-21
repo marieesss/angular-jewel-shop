@@ -21,7 +21,7 @@ import { CartCountPipe } from '../../pipes/item-count.pipe';
               }
               <li><a routerLink="/orders" class="hover:text-blue-200">Orders</a></li>
               <li>
-                <a routerLink="/cart" class="hover:text-blue-200">
+                <a routerLink="/order/cart" class="hover:text-blue-200">
                   Cart ({{ currentOrder() | cartCount }})
                 </a>
               </li>

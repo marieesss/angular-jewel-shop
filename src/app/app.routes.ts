@@ -11,6 +11,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadChildren: () => import('./features/products/product.routes').then(m => m.PRODUCT_ROUTE),
   },
+  {
+    path: 'order',
+    canActivate: [authGuard],
+    loadChildren: () => import('./features/orders/product.routes').then(m => m.ORDER_ROUTE),
+  },
   { path: '', redirectTo: 'products', pathMatch: 'full' },
   { path: '**', redirectTo: 'products' },
 ];
