@@ -8,12 +8,14 @@ import { ProductService } from '../../products/services/product.service';
   providedIn: 'root',
 })
 export class OrderService {
+  private MY_ORDERS_KEY = 'myOrders';
   private ORDERS_KEY = 'orders';
-  private orders: Order[] = [];
+  private myOrders: Order[] = [];
   private authService = inject(AuthService);
   private productService = inject(ProductService);
 
   public currentOrder = signal<Order | null>(null);
+  public orders = signal<Order[]>([]);
 
   private mockedOrders: Order[] = [
     {
@@ -54,23 +56,25 @@ export class OrderService {
     effect(() => {
       const user = this.authService.currentUser$();
 
+      this.saveAllOrders(this.mockedOrders);
+
       if (!user) {
         return;
       }
 
-      const savedOrders = localStorage.getItem(this.ORDERS_KEY);
+      const savedOrders = localStorage.getItem(this.MY_ORDERS_KEY);
       if (savedOrders) {
-        this.orders = JSON.parse(savedOrders);
+        this.myOrders = JSON.parse(savedOrders);
       } else {
         const myOrders = this.mockedOrders.filter(o => o.userId === user.id);
-        this.orders = [...myOrders, this.createEmptyCart(user.id)];
+        this.myOrders = [...myOrders, this.createEmptyCart(user.id)];
         this.saveOrders();
       }
 
-      let cart = this.orders.find(o => o.status === 'cart' && o.userId === user.id);
+      let cart = this.myOrders.find(o => o.status === 'cart' && o.userId === user.id);
       if (!cart) {
         cart = this.createEmptyCart(user.id);
-        this.orders.push(cart);
+        this.myOrders.push(cart);
         this.saveOrders();
       }
 
@@ -80,7 +84,7 @@ export class OrderService {
 
   createEmptyCart(userId: number): Order {
     return {
-      id: this.orders.length + 1,
+      id: this.myOrders.length + 1,
       createdAt: new Date(),
       updatedAt: new Date(),
       items: [],
@@ -91,8 +95,13 @@ export class OrderService {
   }
 
   saveOrders(): void {
-    localStorage.setItem(this.ORDERS_KEY, JSON.stringify(this.orders));
-    this.currentOrder.set(this.orders.find(o => o.status === 'cart') || null);
+    localStorage.setItem(this.MY_ORDERS_KEY, JSON.stringify(this.myOrders));
+    this.currentOrder.set(this.myOrders.find(o => o.status === 'cart') || null);
+  }
+
+  saveAllOrders(orders: Order[]): void {
+    localStorage.setItem(this.ORDERS_KEY, JSON.stringify(orders));
+    this.orders.set(orders);
   }
 
   async addProduct(product: Product, quantity = 1): Promise<void> {
@@ -116,7 +125,7 @@ export class OrderService {
 
     await this.updateTotal(updatedCart);
 
-    this.orders = this.orders.map(o => (o.id === updatedCart.id ? updatedCart : o));
+    this.myOrders = this.myOrders.map(o => (o.id === updatedCart.id ? updatedCart : o));
 
     this.currentOrder.set(updatedCart);
 
@@ -138,7 +147,7 @@ export class OrderService {
 
     await this.updateTotal(updatedCart);
 
-    this.orders = this.orders.map(o => (o.id === updatedCart.id ? updatedCart : o));
+    this.myOrders = this.myOrders.map(o => (o.id === updatedCart.id ? updatedCart : o));
 
     this.currentOrder.set(updatedCart);
     this.saveOrders();
@@ -150,10 +159,14 @@ export class OrderService {
 
     const updatedCart: Order = { ...cart, status: 'pending', updatedAt: new Date() };
 
-    this.orders = this.orders.map(o => (o.id === updatedCart.id ? updatedCart : o));
+    this.myOrders = this.myOrders.map(o => (o.id === updatedCart.id ? updatedCart : o));
+
+    const allOrders = this.orders();
+    const updatedAllOrders = [...allOrders.filter(o => o.id !== updatedCart.id), updatedCart];
+    this.saveAllOrders(updatedAllOrders);
 
     const newCart = this.createEmptyCart(this.authService.currentUser$()?.id || 0);
-    this.orders.push(newCart);
+    this.myOrders.push(newCart);
 
     this.currentOrder.set(newCart);
     this.saveOrders();
@@ -176,6 +189,6 @@ export class OrderService {
   }
 
   getOrdersByStatus(status: OrderStatus): Order[] {
-    return this.orders.filter(o => o.status === status);
+    return this.myOrders.filter(o => o.status === status);
   }
 }
