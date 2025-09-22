@@ -57,7 +57,12 @@ export class OrderService {
     effect(() => {
       const user = this.authService.currentUser$();
 
-      this.saveAllOrders(this.mockedOrders);
+      const existingOrders = localStorage.getItem(this.ORDERS_KEY);
+      if (!existingOrders) {
+        this.saveAllOrders(this.mockedOrders);
+      } else {
+        this.orders.set(JSON.parse(existingOrders));
+      }
 
       if (!user) {
         return;
@@ -193,5 +198,13 @@ export class OrderService {
 
   getOrdersByStatus(status: OrderStatus): Order[] {
     return this.myOrders.filter(o => o.status === status);
+  }
+
+  deleteOrder(orderId: number): void {
+    this.myOrders = this.myOrders.filter(o => o.id !== orderId);
+
+    const updatedAllOrders = this.orders().filter(o => o.id !== orderId);
+    this.saveAllOrders(updatedAllOrders);
+    this.saveOrders();
   }
 }
