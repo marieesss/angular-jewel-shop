@@ -1,15 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { OrderService } from '../../services/order.service';
 import { ProductService } from '../../../products/services/product.service';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
-import { TotalPricePipe } from '../../../../shared/pipes/price.pipe';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, RouterLink, ButtonComponent, TotalPricePipe],
+  imports: [CommonModule, ButtonComponent],
   template: `
     <div class="p-6 max-w-4xl mx-auto">
       <h2 class="text-2xl font-bold mb-6">Mon Panier</h2>

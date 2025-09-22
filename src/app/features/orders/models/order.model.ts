@@ -1,3 +1,5 @@
+import { Product } from '../../products/models/product.model';
+
 export type OrderStatus = 'cart' | 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
 
 export interface OrderItem {
@@ -13,4 +15,8 @@ export interface Order {
   status: OrderStatus;
   userId: number;
   totalPrice: number;
+}
+
+export interface EnrichedOrder extends Order {
+  items: (OrderItem & { product: Product | null })[];
 }

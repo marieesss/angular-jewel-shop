@@ -16,6 +16,7 @@ export class OrderService {
 
   public currentOrder = signal<Order | null>(null);
   public orders = signal<Order[]>([]);
+  public myPastOrders = signal<Order[]>([]);
 
   private mockedOrders: Order[] = [
     {
@@ -79,6 +80,7 @@ export class OrderService {
       }
 
       this.currentOrder.set(cart);
+      this.myPastOrders.set(this.myOrders.filter(o => o.status !== 'cart'));
     });
   }
 
@@ -96,6 +98,7 @@ export class OrderService {
 
   saveOrders(): void {
     localStorage.setItem(this.MY_ORDERS_KEY, JSON.stringify(this.myOrders));
+    this.myPastOrders.set(this.myOrders.filter(o => o.status !== 'cart'));
     this.currentOrder.set(this.myOrders.find(o => o.status === 'cart') || null);
   }
 

@@ -19,7 +19,7 @@ import { CartCountPipe } from '../../pipes/item-count.pipe';
               @if (currentUser()?.role === 'admin') {
                 <li><a routerLink="/admin" class="hover:text-blue-200">Admin</a></li>
               }
-              <li><a routerLink="/orders" class="hover:text-blue-200">Orders</a></li>
+              <li><a routerLink="/order/me" class="hover:text-blue-200">Orders</a></li>
               <li>
                 <a routerLink="/order/cart" class="hover:text-blue-200">
                   Cart ({{ currentOrder() | cartCount }})
