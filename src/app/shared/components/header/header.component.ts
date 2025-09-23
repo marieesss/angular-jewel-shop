@@ -15,16 +15,18 @@ import { CartCountPipe } from '../../pipes/item-count.pipe';
         <nav>
           <ul class="flex space-x-4">
             @if (currentUser()) {
-              <li><a routerLink="/jewels" class="hover:text-blue-200">Jewels</a></li>
               @if (currentUser()?.role === 'admin') {
                 <li><a routerLink="/order/admin" class="hover:text-blue-200">Admin</a></li>
+              } @else {
+                <li><a routerLink="/jewels" class="hover:text-blue-200">Jewels</a></li>
+                <li><a routerLink="/order/me" class="hover:text-blue-200">Orders</a></li>
+                <li>
+                  <a routerLink="/order/cart" class="hover:text-blue-200">
+                    Cart ({{ currentOrder() | cartCount }})
+                  </a>
+                </li>
               }
-              <li><a routerLink="/order/me" class="hover:text-blue-200">Orders</a></li>
-              <li>
-                <a routerLink="/order/cart" class="hover:text-blue-200">
-                  Cart ({{ currentOrder() | cartCount }})
-                </a>
-              </li>
+
               <li><button (click)="logout()" class="hover:text-blue-200">Logout</button></li>
             } @else {
               <li><a routerLink="/auth/login" class="hover:text-blue-200">Login</a></li>
