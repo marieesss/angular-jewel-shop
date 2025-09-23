@@ -207,4 +207,17 @@ export class OrderService {
     this.saveAllOrders(updatedAllOrders);
     this.saveOrders();
   }
+
+  updateOrderStatus(orderId: number, newStatus: OrderStatus): void {
+    this.myOrders = this.myOrders.map(o =>
+      o.id === orderId ? { ...o, status: newStatus, updatedAt: new Date() } : o
+    );
+
+    const updatedAllOrders = this.orders().map(item =>
+      item.id === orderId ? { ...item, status: newStatus, updatedAt: new Date() } : item
+    );
+
+    this.saveAllOrders(updatedAllOrders);
+    this.saveOrders();
+  }
 }

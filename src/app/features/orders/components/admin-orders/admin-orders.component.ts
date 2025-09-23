@@ -1,20 +1,21 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService } from '../../services/order.service';
 import { ProductService } from '../../../products/services/product.service';
-import { EnrichedOrder } from '../../models/order.model';
+import { EnrichedOrder, OrderStatus } from '../../models/order.model';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-admin-orders',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="p-6 max-w-4xl mx-auto">
       <h2 class="text-2xl font-bold mb-6">User Orders</h2>
 
-      @if (enrichedOrders.length > 0) {
+      @if (enrichedOrders().length > 0) {
         <div>
-          @if (enrichedOrders.length === 0) {
+          @if (enrichedOrders().length === 0) {
             <p class="text-gray-600">Aucune commande trouvée.</p>
           } @else {
             <table class="w-full border-collapse">
@@ -28,7 +29,7 @@ import { EnrichedOrder } from '../../models/order.model';
                 </tr>
               </thead>
               <tbody>
-                @for (item of enrichedOrders; track item.id) {
+                @for (item of enrichedOrders(); track item.id) {
                   <tr class="border-b">
                     <td class="p-2">{{ item.createdAt | date: 'short' }}</td>
                     <td class="p-2 text-center">
@@ -46,6 +47,13 @@ import { EnrichedOrder } from '../../models/order.model';
                     <td class="p-2 text-right">{{ item.totalPrice | number: '1.2-2' }} €</td>
                     <td class="p-2 text-right">
                       {{ item.status }}
+                      <select
+                        class="border rounded px-2 py-1"
+                        [ngModel]="item.status"
+                        (ngModelChange)="updateOrderStatus(item.id, $event)"
+                      >
+                        <option *ngFor="let s of orderStatuses" [ngValue]="s">{{ s }}</option>
+                      </select>
                     </td>
                     <td class="p-2 text-right">
                       <button
@@ -67,32 +75,38 @@ import { EnrichedOrder } from '../../models/order.model';
     </div>
   `,
 })
-export class AdminOrdersComponent implements OnInit {
+export class AdminOrdersComponent {
   orderService = inject(OrderService);
   productService = inject(ProductService);
-  enrichedOrders: EnrichedOrder[] = [];
+  enrichedOrders = signal<EnrichedOrder[]>([]);
 
-  // Utile pour charger les images des produits dans les commandes passées sans reload infini
-  ngOnInit() {
-    this.init();
+  orderStatuses: OrderStatus[] = ['pending', 'shipped', 'delivered', 'cancelled'];
+
+  constructor() {
+    effect(async () => {
+      const allOrders = this.orderService.orders();
+
+      await Promise.all(
+        allOrders.map(async order => ({
+          ...order,
+          items: await Promise.all(
+            order.items.map(async i => ({
+              ...i,
+              product: await this.productService.getProductById(i.productId),
+            }))
+          ),
+        }))
+      ).then(enriched => {
+        this.enrichedOrders.set(enriched);
+      });
+    });
   }
 
-  async init() {
-    this.enrichedOrders = await Promise.all(
-      this.orderService.orders().map(async order => ({
-        ...order,
-        items: await Promise.all(
-          order.items.map(async i => ({
-            ...i,
-            product: await this.productService.getProductById(i.productId),
-          }))
-        ),
-      }))
-    );
+  updateOrderStatus(orderId: number, newStatus: OrderStatus) {
+    this.orderService.updateOrderStatus(orderId, newStatus);
   }
 
   deleteOrder(orderId: number) {
     this.orderService.deleteOrder(orderId);
-    this.init();
   }
 }
