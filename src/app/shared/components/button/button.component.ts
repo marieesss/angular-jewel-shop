@@ -24,7 +24,7 @@ export class ButtonComponent {
   @Input() size: BtnSize = 'lg';
   @Input() variant: BtnVariant = 'primary';
   @Input() fullWidth = false;
-
+  @Input() disabled?: boolean = false;
   @Output() clicked = new EventEmitter<MouseEvent>();
 
   classes = computed(() => {
@@ -42,10 +42,17 @@ export class ButtonComponent {
         'border border-gray-300 text-gray-900 bg-transparent hover:bg-gray-100 focus:ring-blue-500',
     };
 
-    return [base.join(' '), sizes[this.size], variants[this.variant]].join(' ');
+    return [
+      base.join(' '),
+      sizes[this.size],
+      variants[this.variant],
+      this.disabled ? 'opacity-50 cursor-not-allowed' : '',
+    ].join(' ');
   });
 
   onClick(ev: MouseEvent) {
-    this.clicked.emit(ev);
+    if (!this.disabled) {
+      this.clicked.emit(ev);
+    }
   }
 }

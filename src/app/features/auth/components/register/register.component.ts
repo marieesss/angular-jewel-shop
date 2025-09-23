@@ -10,6 +10,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 // Validateur personnalisé pour la confirmation de mot de passe
 function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
@@ -25,12 +26,12 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ButtonComponent],
   template: `
     <div
-      class="min-h-screen text-black w-fit flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+      class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
     >
-      <div class="w-full space-y-8">
+      <div class="w-full max-w-md space-y-8 text-black">
         <div>
           <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Créer un compte</h2>
         </div>
@@ -112,10 +113,11 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
 
           <!-- Submit Button -->
           <div>
-            <button
+            <app-button
               type="submit"
               [disabled]="registerForm.invalid || loading()"
-              class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              variant="primary"
+              [fullWidth]="true"
             >
               @if (loading()) {
                 <span
@@ -125,7 +127,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
               } @else {
                 Créer le compte
               }
-            </button>
+            </app-button>
           </div>
 
           <!-- Error Message -->
