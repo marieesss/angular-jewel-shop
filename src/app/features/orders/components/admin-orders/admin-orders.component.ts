@@ -46,7 +46,6 @@ import { FormsModule } from '@angular/forms';
                     </td>
                     <td class="p-2 text-right">{{ item.totalPrice | number: '1.2-2' }} €</td>
                     <td class="p-2 text-right">
-                      {{ item.status }}
                       <select
                         class="border rounded px-2 py-1"
                         [ngModel]="item.status"
