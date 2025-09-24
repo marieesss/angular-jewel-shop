@@ -49,6 +49,7 @@ export class HeaderComponent {
 
   logout() {
     this.authService.logout();
+    this.orderService.flushCart();
     this.router.navigate(['/auth/login']);
   }
 }

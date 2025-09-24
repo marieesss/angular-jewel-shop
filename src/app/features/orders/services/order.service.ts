@@ -53,39 +53,50 @@ export class OrderService {
     },
   ];
 
+  private loadAllOrders(): Order[] {
+    return JSON.parse(localStorage.getItem(this.ORDERS_KEY) || '[]');
+  }
+
+  private loadMyOrders(): Order[] {
+    return JSON.parse(localStorage.getItem(this.MY_ORDERS_KEY) || '[]');
+  }
+
   constructor() {
     effect(() => {
       const user = this.authService.currentUser$();
+      if (!user) return;
 
-      const existingOrders = localStorage.getItem(this.ORDERS_KEY);
-      if (!existingOrders) {
-        this.saveAllOrders(this.mockedOrders);
-      } else {
-        this.orders.set(JSON.parse(existingOrders));
+      // Load all orders
+      let allOrders = this.loadAllOrders();
+      if (allOrders.length === 0) {
+        allOrders = this.mockedOrders;
+        this.saveAllOrders(allOrders);
       }
 
-      if (!user) {
-        return;
+      // Load my orders (always filtered by userId)
+      let myOrders = this.loadMyOrders().filter(o => o.userId === user.id);
+
+      if (myOrders.length === 0) {
+        // If no "my orders", filter directly the global ones
+        myOrders = allOrders.filter(o => o.userId === user.id);
       }
 
-      const savedOrders = localStorage.getItem(this.MY_ORDERS_KEY);
-      if (savedOrders) {
-        this.myOrders = JSON.parse(savedOrders);
-      } else {
-        const myOrders = this.mockedOrders.filter(o => o.userId === user.id);
-        this.myOrders = [...myOrders, this.createEmptyCart(user.id)];
-        this.saveOrders();
-      }
-
-      let cart = this.myOrders.find(o => o.status === 'cart' && o.userId === user.id);
+      // Check if a cart exists
+      let cart = myOrders.find(o => o.status === 'cart');
       if (!cart) {
         cart = this.createEmptyCart(user.id);
-        this.myOrders.push(cart);
-        this.saveOrders();
+        myOrders.push(cart);
+        allOrders.push(cart);
       }
 
+      // Update the data
+      this.myOrders = myOrders;
+      this.saveOrders();
+      this.saveAllOrders(allOrders);
+
+      // Update the signals
       this.currentOrder.set(cart);
-      this.myPastOrders.set(this.myOrders.filter(o => o.status !== 'cart'));
+      this.myPastOrders.set(myOrders.filter(o => o.status !== 'cart'));
     });
   }
 
@@ -219,5 +230,23 @@ export class OrderService {
 
     this.saveAllOrders(updatedAllOrders);
     this.saveOrders();
+  }
+
+  flushCart(): void {
+    const cart = this.currentOrder();
+    if (!cart) return;
+
+    // Retirer le panier de mes commandes
+    this.myOrders = this.myOrders.filter(o => o.id !== cart.id);
+
+    // Retirer le panier de toutes les commandes
+    const updatedAllOrders = this.orders().filter(o => o.id !== cart.id);
+
+    // Sauvegarde
+    this.saveAllOrders(updatedAllOrders);
+    this.saveOrders();
+
+    // Reset du signal
+    this.currentOrder.set(null);
   }
 }
