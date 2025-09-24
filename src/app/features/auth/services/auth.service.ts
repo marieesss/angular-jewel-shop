@@ -44,6 +44,10 @@ export class AuthService {
     () => this.currentUser() && (this.isAdmin() || this.currentUser()?.role === 'user')
   );
 
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   constructor() {
     effect(() => {
       // Vérifier s'il y a un utilisateur en session
@@ -127,6 +131,12 @@ export class AuthService {
 
   getAllUsers(): Observable<User[]> {
     return of(this.users).pipe(delay(300));
+  }
+
+  async getUserById(userId: number): Promise<User | null> {
+    await this.delay(300);
+    console.log(this.users);
+    return this.users.find(u => u.id === userId) || null;
   }
 
   deleteUser(userId: number): Observable<void> {

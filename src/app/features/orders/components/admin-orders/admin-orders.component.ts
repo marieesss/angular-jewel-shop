@@ -4,6 +4,7 @@ import { OrderService } from '../../services/order.service';
 import { ProductService } from '../../../products/services/product.service';
 import { EnrichedOrder, OrderStatus } from '../../models/order.model';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-admin-orders',
@@ -22,6 +23,8 @@ import { FormsModule } from '@angular/forms';
               <thead>
                 <tr class="bg-gray-100">
                   <th class="text-left p-2">Date</th>
+                  <th class="text-left p-2">Utilisateur</th>
+                  <th class="text-left p-2">Email</th>
                   <th class="text-center p-2">Produits</th>
                   <th class="text-right p-2">Prix</th>
                   <th class="text-right p-2">Status</th>
@@ -32,6 +35,8 @@ import { FormsModule } from '@angular/forms';
                 @for (item of enrichedOrders(); track item.id) {
                   <tr class="border-b">
                     <td class="p-2">{{ item.createdAt | date: 'short' }}</td>
+                    <td class="p-2">{{ item.user?.name }}</td>
+                    <td class="p-2">{{ item.user?.email }}</td>
                     <td class="p-2 text-center">
                       @for (subItem of item.items; track subItem.productId) {
                         <div class="flex items-center justify-center gap-2 mb-1">
@@ -77,6 +82,7 @@ import { FormsModule } from '@angular/forms';
 export class AdminOrdersComponent {
   orderService = inject(OrderService);
   productService = inject(ProductService);
+  userService = inject(AuthService);
   enrichedOrders = signal<EnrichedOrder[]>([]);
 
   orderStatuses: OrderStatus[] = ['pending', 'shipped', 'delivered', 'cancelled'];
@@ -88,6 +94,7 @@ export class AdminOrdersComponent {
       await Promise.all(
         allOrders.map(async order => ({
           ...order,
+          user: await this.userService.getUserById(order.userId),
           items: await Promise.all(
             order.items.map(async i => ({
               ...i,
@@ -96,6 +103,7 @@ export class AdminOrdersComponent {
           ),
         }))
       ).then(enriched => {
+        console.log(enriched);
         this.enrichedOrders.set(enriched);
       });
     });

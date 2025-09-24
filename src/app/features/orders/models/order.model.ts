@@ -1,3 +1,4 @@
+import { User } from '../../auth/models/user.model';
 import { Product } from '../../products/models/product.model';
 
 export type OrderStatus = 'cart' | 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
@@ -18,5 +19,6 @@ export interface Order {
 }
 
 export interface EnrichedOrder extends Order {
+  user?: User | null;
   items: (OrderItem & { product: Product | null })[];
 }
