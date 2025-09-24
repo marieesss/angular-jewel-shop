@@ -5,11 +5,12 @@ import { ProductService } from '../../../products/services/product.service';
 import { EnrichedOrder, OrderStatus } from '../../models/order.model';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../auth/services/auth.service';
+import { OrderStatusColorDirective } from '../../../../shared/directives/row.directive';
 
 @Component({
   selector: 'app-admin-orders',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, OrderStatusColorDirective],
   template: `
     <div class="p-6 max-w-4xl mx-auto">
       <h2 class="text-2xl font-bold mb-6">User Orders</h2>
@@ -33,7 +34,7 @@ import { AuthService } from '../../../auth/services/auth.service';
               </thead>
               <tbody>
                 @for (item of enrichedOrders(); track item.id) {
-                  <tr class="border-b">
+                  <tr class="border-b" [appOrderStatusColor]="item.status">
                     <td class="p-2">{{ item.createdAt | date: 'short' }}</td>
                     <td class="p-2">{{ item.user?.name }}</td>
                     <td class="p-2">{{ item.user?.email }}</td>

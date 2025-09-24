@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { OrderService } from '../../services/order.service';
 import { ProductService } from '../../../products/services/product.service';
 import { EnrichedOrder } from '../../models/order.model';
+import { OrderStatusColorDirective } from '../../../../shared/directives/row.directive';
 
 @Component({
   selector: 'app-user-orders',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, OrderStatusColorDirective],
   template: `
     <div class="p-6 max-w-4xl mx-auto">
       <h2 class="text-2xl font-bold mb-6">Mes Commandes</h2>
@@ -28,7 +29,7 @@ import { EnrichedOrder } from '../../models/order.model';
               </thead>
               <tbody>
                 @for (item of enrichedOrders; track item.id) {
-                  <tr class="border-b">
+                  <tr class="border-b" [appOrderStatusColor]="item.status">
                     <td class="p-2">{{ item.createdAt | date: 'short' }}</td>
                     <td class="p-2 text-center">
                       @for (subItem of item.items; track subItem.productId) {
