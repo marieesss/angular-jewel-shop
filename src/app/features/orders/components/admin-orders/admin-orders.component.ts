@@ -90,7 +90,7 @@ export class AdminOrdersComponent {
 
   constructor() {
     effect(async () => {
-      const allOrders = this.orderService.orders();
+      const allOrders = this.orderService.orders().filter(o => o.status !== 'cart');
 
       await Promise.all(
         allOrders.map(async order => ({
@@ -104,7 +104,6 @@ export class AdminOrdersComponent {
           ),
         }))
       ).then(enriched => {
-        console.log(enriched);
         this.enrichedOrders.set(enriched);
       });
     });
