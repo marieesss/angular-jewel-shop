@@ -1,4 +1,4 @@
-import { computed, effect, Injectable, signal } from '@angular/core';
+import { effect, Injectable, signal } from '@angular/core';
 import { Observable, of, throwError, delay, tap } from 'rxjs';
 import { User, LoginRequest, RegisterRequest } from '../models/user.model';
 
@@ -37,12 +37,6 @@ export class AuthService {
 
   private users: User[] = [];
   private passwords: Record<string, string> = {};
-
-  public isAdmin = computed(() => this.currentUser()?.role === 'admin');
-
-  public canEditTodos = computed(
-    () => this.currentUser() && (this.isAdmin() || this.currentUser()?.role === 'user')
-  );
 
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -135,7 +129,6 @@ export class AuthService {
 
   async getUserById(userId: number): Promise<User | null> {
     await this.delay(300);
-    console.log(this.users);
     return this.users.find(u => u.id === userId) || null;
   }
 
