@@ -108,7 +108,11 @@ export class LoginComponent {
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
           this.loading.set(false);
-          this.router.navigate(['/todos']);
+          if (this.authService.currentUser$()?.role === 'admin') {
+            this.router.navigate(['/order/admin']);
+            return;
+          }
+          this.router.navigate(['/']);
         },
         error: err => {
           this.loading.set(false);
